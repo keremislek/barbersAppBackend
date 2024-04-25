@@ -1,9 +1,9 @@
 package com.example.barbersApp.entities;
 
 
-
 import java.util.List;
 
+import com.example.barbersApp.entities.AdressesInfo;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,6 +13,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,8 +32,6 @@ public class Barber extends BaseUserEntity { //Hareket
 	 
 	private String address;
 	private String barberName;
-	
-	
     private String photoUrl;
 	
 	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
@@ -43,4 +42,7 @@ public class Barber extends BaseUserEntity { //Hareket
 
 	@OneToMany(mappedBy = "barber", cascade = CascadeType.ALL)
 	private List<ServicesInfo> servicesInfo;
+
+	@OneToOne(mappedBy = "barber", cascade = CascadeType.ALL)
+    private AdressesInfo addressesInfo;
 }	

@@ -25,8 +25,9 @@ public class District {
     private Long id;
     private String name;
 
-    @OneToMany(mappedBy = "district", cascade = CascadeType.ALL)
-    private List<Address> address;
+    @OneToMany(mappedBy = "district",cascade = CascadeType.ALL)
+    private List<AdressesInfo> adressesInfos;
 
+    
    
 }

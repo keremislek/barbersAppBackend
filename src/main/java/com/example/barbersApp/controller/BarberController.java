@@ -23,7 +23,7 @@ import com.example.barbersApp.response.BarberResponse;
 
 import com.example.barbersApp.service.BarberService;
 
-import io.jsonwebtoken.io.IOException;
+
 
 @RestController
 @RequestMapping("/barbers")
