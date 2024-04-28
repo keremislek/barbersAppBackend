@@ -5,12 +5,24 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.barbersApp.entities.AdressesInfo;
 import com.example.barbersApp.entities.Appointments;
+import com.example.barbersApp.entities.Barber;
+import com.example.barbersApp.repository.AddressesInfoRepository;
 import com.example.barbersApp.repository.AppointmentRepository;
+import com.example.barbersApp.repository.BarberRepository;
 import com.example.barbersApp.request.AppointmentsRequest;
 import com.example.barbersApp.response.AppointmentsResponse;
 import com.example.barbersApp.response.AvaliableAppointmentHours;
+import com.example.barbersApp.response.BarberDetailResponse;
+import com.example.barbersApp.response.BarberResponse;
 import com.example.barbersApp.service.AppointmentsService;
+
+import jakarta.persistence.EntityNotFoundException;
+
+import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +32,8 @@ public class AppointmentsServiceImpl implements AppointmentsService {
     
 
     private final AppointmentRepository appointmentRepository;
+    private final BarberRepository barberRepository;
+    private final AddressesInfoRepository addressesInfoRepository;
 
     @Override
     public Appointments getAppointmentsById(Long id) {
@@ -152,9 +166,28 @@ public class AppointmentsServiceImpl implements AppointmentsService {
     }
 
     @Override
-    public AvaliableAppointmentHours getAvaliableByDistrict(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAvaliableByDistrict'");
+    public List<BarberDetailResponse> getAvaliableByDistrict(Long id) {
+        List<AdressesInfo> addressesInfos = addressesInfoRepository.findByDistrictId(id);
+        
+        List<Long> barbersId=new ArrayList<>();
+        for (AdressesInfo adressesInfo : addressesInfos) {
+            barbersId.add(adressesInfo.getBarber().getId());
+        }
+        List<Barber> barber=new ArrayList<>();
+        for (Long barberId : barbersId) {
+           barber.add(barberRepository.findById(barberId).orElseThrow(()-> new EntityNotFoundException("barber not found: "+barberId))) ;
+        }
+
+        
+        return barber.stream().map(this::mapToBarberResponse).collect(Collectors.toList());
+     
+                
+    }
+    private BarberDetailResponse mapToBarberResponse(Barber barber){
+        return BarberDetailResponse.builder().barberName(barber.getBarberName())
+		.id(barber.getId())
+        .photoUrl(barber.getPhotoUrl())
+		.address(barber.getAddressesInfo().getFullAddress()).build();
     }
 
 }
