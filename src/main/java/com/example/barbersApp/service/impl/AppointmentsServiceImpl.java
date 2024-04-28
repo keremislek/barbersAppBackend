@@ -151,4 +151,10 @@ public class AppointmentsServiceImpl implements AppointmentsService {
         
     }
 
+    @Override
+    public AvaliableAppointmentHours getAvaliableByDistrict(Long id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAvaliableByDistrict'");
+    }
+
 }

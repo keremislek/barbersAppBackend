@@ -43,5 +43,10 @@ public class AppointmentController {
     public AvaliableAppointmentHours getAvaliableAppointment(@PathVariable Long id){
         return appointmentsService.getAvaliableAppointment(id);
     }
+
+    @GetMapping("/{id}")
+    public AvaliableAppointmentHours getAvaibleByDistrict(@PathVariable Long id){
+        return appointmentsService.getAvaliableByDistrict(id);
+    }
     
 }

@@ -44,7 +44,6 @@ public class BarberServiceImpl implements BarberService {
 	@Override
 	public AuthenticationResponse register(CreateBarberRequest request) {
 		Barber barber=Barber.builder()
-		.address(request.getAddress())
 		.barberName(request.getBarberName())
 		.email(request.getEmail())
 		.password(passwordEncoder.encode(request.getPassword()))//passwordEncoder.encode(request.getPassword()))
@@ -79,7 +78,7 @@ public class BarberServiceImpl implements BarberService {
 	private BarberResponse mapToBarberResponse(Barber barber){
 		return BarberResponse.builder().barberName(barber.getBarberName())
 		.id(barber.getId())
-		.address(barber.getAddress()).build();
+		.address(barber.getAddressesInfo().getFullAddress()).build();
 	}
 
 	@Override
@@ -88,7 +87,7 @@ public class BarberServiceImpl implements BarberService {
 	
 		BarberDetailResponse barberDetailResponse=BarberDetailResponse.builder()
 		.id(id)
-		.address(barber.getAddress())
+		.address(barber.getAddressesInfo().getFullAddress())
 		.barberName(barber.getBarberName())
 		.services(barber.getServices())
 		.photoUrl(barber.getPhotoUrl())
@@ -102,7 +101,7 @@ public class BarberServiceImpl implements BarberService {
 	public BarberResponse getBarberByEmail(String email) {
 		Barber barber=barberRepository.findByEmail(email).orElseThrow(()->new EntityNotFoundException("barber not found by email : "+email));
 		BarberResponse barberResponse=BarberResponse.builder()
-		.address(barber.getAddress())
+		.address(barber.getAddressesInfo().getFullAddress())
 		.barberName(barber.getBarberName())
 		.id(barber.getId())
 		.build();

@@ -13,5 +13,6 @@ public interface AppointmentsService {
     Appointments getAppointmentsById(Long id);
     AppointmentsResponse createOrUpdateAppointments(AppointmentsRequest request);
     AvaliableAppointmentHours getAvaliableAppointment(Long id);
+    AvaliableAppointmentHours getAvaliableByDistrict(Long id);
 
 }
