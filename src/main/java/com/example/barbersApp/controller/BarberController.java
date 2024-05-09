@@ -18,7 +18,8 @@ import com.example.barbersApp.request.CreateBarberRequest;
 import com.example.barbersApp.response.AuthenticationResponse;
 import com.example.barbersApp.response.BarberDetailResponse;
 import com.example.barbersApp.response.BarberResponse;
-
+import com.example.barbersApp.response.BarberTop5Query;
+import com.example.barbersApp.response.FamousBarbers;
 import com.example.barbersApp.service.BarberService;
 
 
@@ -61,6 +62,10 @@ public class BarberController {
 		return ResponseEntity.ok(barberService.authenticate(request));
 	}
 
+	@GetMapping("/famous")
+	public ResponseEntity<List<BarberTop5Query>> getFamousBarberByRating(){
+		return ResponseEntity.ok().body(barberService.getFamousBarberByRating());
+	}
 	
 	
 	

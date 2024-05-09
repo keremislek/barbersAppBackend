@@ -1,5 +1,6 @@
 package com.example.barbersApp.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -50,6 +51,11 @@ public class AppointmentController {
     @GetMapping("/{id}")
     public List<BarberDetailResponse> getAvaibleByDistrict(@PathVariable Long id){
         return appointmentsService.getAvaliableByDistrict(id);
+    }
+
+    @GetMapping("/date")
+    public List<BarberDetailResponse> getAvailableByDate(@RequestParam(name = "date") LocalDate date){
+        return appointmentsService.getAvailableByDate(date);
     }
     
 }

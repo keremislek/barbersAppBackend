@@ -1,27 +1,35 @@
 package com.example.barbersApp.service.impl;
 
-import java.io.IOException;
+
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
-import java.util.Base64;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+
 
 import com.example.barbersApp.entities.Barber;
+
 import com.example.barbersApp.entities.Role;
 import com.example.barbersApp.repository.BarberRepository;
+import com.example.barbersApp.repository.CommentRepository;
+import com.example.barbersApp.repository.RatingRepository;
 import com.example.barbersApp.request.AuthenticationRequest;
 import com.example.barbersApp.request.CreateBarberRequest;
 import com.example.barbersApp.response.AuthenticationResponse;
 import com.example.barbersApp.response.BarberDetailResponse;
 import com.example.barbersApp.response.BarberResponse;
+import com.example.barbersApp.response.BarberTop5Query;
+
 import com.example.barbersApp.service.BarberService;
 
 import jakarta.persistence.EntityNotFoundException;
+
 
 
 
@@ -32,13 +40,19 @@ public class BarberServiceImpl implements BarberService {
 	 PasswordEncoder passwordEncoder;
 	 JwtService jwtService;
 	 AuthenticationManager authenticationManager;
+	 RatingRepository ratingRepository;
+	 CommentRepository commentRepository;
+	 BarberTop5Query barberTop5Query;
 
 	
-	public BarberServiceImpl(BarberRepository barberRepository,PasswordEncoder passwordEncoder,JwtService jwtService,AuthenticationManager authenticationManager) {
+	public BarberServiceImpl(BarberRepository barberRepository,PasswordEncoder passwordEncoder,JwtService jwtService,AuthenticationManager authenticationManager, RatingRepository ratingRepository,
+		CommentRepository commentRepository) {
 		this.barberRepository=barberRepository;
 		this.passwordEncoder=passwordEncoder;
 		this.jwtService=jwtService;
 		this.authenticationManager=authenticationManager;
+		this.ratingRepository=ratingRepository;
+		this.commentRepository=commentRepository;
 	}
 
 	@Override
@@ -76,9 +90,18 @@ public class BarberServiceImpl implements BarberService {
 	}
 
 	private BarberResponse mapToBarberResponse(Barber barber){
+		String fullAddress = null;
+        if (barber.getAddressesInfo() != null) {
+            fullAddress = barber.getAddressesInfo().getFullAddress();
+        }
+        if (fullAddress == null) {
+            fullAddress = "Bilinmeyen Adres";
+        }
+		
 		return BarberResponse.builder().barberName(barber.getBarberName())
 		.id(barber.getId())
-		.address(barber.getAddressesInfo().getFullAddress()).build();
+		.photoUrl(barber.getPhotoUrl())
+		.address(fullAddress).build();
 	}
 
 	@Override
@@ -108,6 +131,34 @@ public class BarberServiceImpl implements BarberService {
 
 		return barberResponse;
 	}
+
+	@Override
+public List<BarberTop5Query> getFamousBarberByRating() {
+    List<Object[]> results = ratingRepository.findfamousByRating(PageRequest.of(0, 6));
+    
+    List<BarberTop5Query> famousBarber = new ArrayList<>();
+
+    for (Object[] result : results) {
+        BarberTop5Query barberTop5Query = new BarberTop5Query() {
+            @Override
+            public Long getBarberId() {
+                return (Long) result[0];
+            }
+
+            @Override
+            public Double getAvgRate() {
+                return (Double) result[1];
+            }
+        };
+
+        famousBarber.add(barberTop5Query);
+    }
+
+    return famousBarber;
+}
+
+	
+	
 
 	
 

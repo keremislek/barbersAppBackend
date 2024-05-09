@@ -1,5 +1,6 @@
 package com.example.barbersApp.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.example.barbersApp.entities.Appointments;
@@ -17,5 +18,6 @@ public interface AppointmentsService {
     AppointmentsResponse createOrUpdateAppointments(AppointmentsRequest request);
     AvaliableAppointmentHours getAvaliableAppointment(Long id);
     List<BarberDetailResponse> getAvaliableByDistrict(Long id);
+    List<BarberDetailResponse> getAvailableByDate(LocalDate date);
 
 }
