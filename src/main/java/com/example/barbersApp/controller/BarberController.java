@@ -63,7 +63,7 @@ public class BarberController {
 	}
 
 	@GetMapping("/famous")
-	public ResponseEntity<List<BarberTop5Query>> getFamousBarberByRating(){
+	public ResponseEntity<List<FamousBarbers>> getFamousBarberByRating(){
 		return ResponseEntity.ok().body(barberService.getFamousBarberByRating());
 	}
 	

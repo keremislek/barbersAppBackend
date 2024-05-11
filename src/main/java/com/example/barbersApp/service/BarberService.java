@@ -30,7 +30,7 @@ public interface BarberService {
 
     BarberResponse getBarberByEmail(String email);
 
-    List<BarberTop5Query> getFamousBarberByRating();
+    List<FamousBarbers> getFamousBarberByRating();
 
 
 }

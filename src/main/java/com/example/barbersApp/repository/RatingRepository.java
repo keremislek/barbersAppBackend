@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.example.barbersApp.entities.Rating;
-import com.example.barbersApp.response.BarberTop5Query;
 
 
 @Repository

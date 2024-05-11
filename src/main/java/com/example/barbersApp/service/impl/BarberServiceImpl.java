@@ -25,7 +25,7 @@ import com.example.barbersApp.response.AuthenticationResponse;
 import com.example.barbersApp.response.BarberDetailResponse;
 import com.example.barbersApp.response.BarberResponse;
 import com.example.barbersApp.response.BarberTop5Query;
-
+import com.example.barbersApp.response.FamousBarbers;
 import com.example.barbersApp.service.BarberService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -133,11 +133,11 @@ public class BarberServiceImpl implements BarberService {
 	}
 
 	@Override
-public List<BarberTop5Query> getFamousBarberByRating() {
+	public List<FamousBarbers> getFamousBarberByRating() {
     List<Object[]> results = ratingRepository.findfamousByRating(PageRequest.of(0, 6));
     
     List<BarberTop5Query> famousBarber = new ArrayList<>();
-
+	List<Barber> barbers= new ArrayList<>();
     for (Object[] result : results) {
         BarberTop5Query barberTop5Query = new BarberTop5Query() {
             @Override
@@ -150,16 +150,37 @@ public List<BarberTop5Query> getFamousBarberByRating() {
                 return (Double) result[1];
             }
         };
-
+		
         famousBarber.add(barberTop5Query);
     }
+	for (BarberTop5Query query : famousBarber) {
+		Long barberId=query.getBarberId();
+		Barber barber=barberRepository.findById(barberId).orElseThrow(()->new EntityNotFoundException("Barber not found with id : "+barberId));
+		barbers.add(barber);
+	}
 
-    return famousBarber;
+
+    return mapToFamousBarbers(barbers,famousBarber);
 }
 
-	
-	
+private List<FamousBarbers> mapToFamousBarbers(List<Barber> barbers, List<BarberTop5Query> famousBarber){
+    List<FamousBarbers> famousBarbers = new ArrayList<>();
 
-	
+    for (int i = 0; i < barbers.size(); i++) {
+        Barber barber = barbers.get(i);
+        BarberTop5Query query = famousBarber.get(i);
+        
+        FamousBarbers a = new FamousBarbers();
+        a.setBarberId(barber.getId());
+        a.setPhotoUrl(barber.getPhotoUrl());
+        a.setBarberName(barber.getBarberName());
+        a.setBarberAddress(barber.getAddress());
+        a.setRate(query.getAvgRate()); // set the rate from BarberTop5Query
+        
+        famousBarbers.add(a);
+    }
+
+    return famousBarbers;
+}
 
 }
