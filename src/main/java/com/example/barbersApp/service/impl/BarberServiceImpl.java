@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.ArrayList;
 
 import org.springframework.data.domain.Pageable;
+import java.util.Optional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,7 +15,8 @@ import org.springframework.stereotype.Service;
 
 
 import com.example.barbersApp.entities.Barber;
-
+import com.example.barbersApp.entities.Comment;
+import com.example.barbersApp.entities.Rating;
 import com.example.barbersApp.entities.Role;
 import com.example.barbersApp.repository.BarberRepository;
 import com.example.barbersApp.repository.CommentRepository;
@@ -35,7 +37,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class BarberServiceImpl implements BarberService {
-
+	
 	 BarberRepository barberRepository;
 	 PasswordEncoder passwordEncoder;
 	 JwtService jwtService;
@@ -107,13 +109,28 @@ public class BarberServiceImpl implements BarberService {
 	@Override
 	public BarberDetailResponse getBarberById(Long id) {
 		var barber=barberRepository.findById(id).orElseThrow(()->new EntityNotFoundException("barber not found by id: "+id));
-	
+		List<Rating> ratings = ratingRepository.findByBarberId(Optional.of(id));
+		List<Comment> comments= commentRepository.findByBarberId(Optional.of(id));
+
+		
+		double avg=0;
+		for (Rating rating : ratings) {
+			avg+=rating.getRate();
+
+		}
+		avg=avg/ratings.size();
+		
+		String fullAddress = barber.getAddressesInfo() != null ? barber.getAddressesInfo().getFullAddress() : "Bilinmeyen Adres";
+		
+
 		BarberDetailResponse barberDetailResponse=BarberDetailResponse.builder()
 		.id(id)
-		.address(barber.getAddressesInfo().getFullAddress())
+		.address(fullAddress)
 		.barberName(barber.getBarberName())
 		.services(barber.getServices())
 		.photoUrl(barber.getPhotoUrl())
+		.rate(avg)
+		.commentSize(comments.size())
 		.build();
 
 		return barberDetailResponse;
@@ -170,14 +187,14 @@ private List<FamousBarbers> mapToFamousBarbers(List<Barber> barbers, List<Barber
         Barber barber = barbers.get(i);
         BarberTop5Query query = famousBarber.get(i);
         
-        FamousBarbers a = new FamousBarbers();
-        a.setBarberId(barber.getId());
-        a.setPhotoUrl(barber.getPhotoUrl());
-        a.setBarberName(barber.getBarberName());
-        a.setBarberAddress(barber.getAddress());
-        a.setRate(query.getAvgRate()); // set the rate from BarberTop5Query
+        FamousBarbers topBarber = new FamousBarbers();
+        topBarber.setBarberId(barber.getId());
+        topBarber.setPhotoUrl(barber.getPhotoUrl());
+        topBarber.setBarberName(barber.getBarberName());
+        topBarber.setBarberAddress(barber.getAddress());
+        topBarber.setRate(query.getAvgRate()); // set the rate from BarberTop5Query
         
-        famousBarbers.add(a);
+        famousBarbers.add(topBarber);
     }
 
     return famousBarbers;

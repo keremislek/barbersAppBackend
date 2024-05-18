@@ -17,10 +17,11 @@ public interface RatingRepository extends JpaRepository<Rating,Long>{
     List<Rating> findByCustomerIdAndBarberId(Optional<Long> customerId, Optional<Long> barberId);
 
     List<Rating> findByBarberId(Optional<Long> barberId);
+    List<Rating> findByBarberId(Long barberId);
 
     List<Rating> findByCustomerId(Optional<Long> customerId);
 
-    Integer findByBarberId(Long id);
+    
 
     @Query("SELECT barber.id, AVG(rate) AS avgrate FROM Rating r GROUP BY r.barber.id ORDER BY avgrate DESC")
     List<Object []> findfamousByRating(Pageable pageable);

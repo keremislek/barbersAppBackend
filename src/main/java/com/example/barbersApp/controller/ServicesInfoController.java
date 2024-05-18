@@ -29,6 +29,13 @@ public class ServicesInfoController {
     public ServicesInfoController(ServicesInfoService servicesInfoService){
         this.servicesInfoService=servicesInfoService;
     }
+   
+    @GetMapping("/barber/{id}")
+    public List<ServicesInfoBarberIdResponse> getByBarberId(@PathVariable Long id) {
+        return servicesInfoService.getServicesByBarberId(id);
+        
+        
+    }
 
     @PostMapping("/create")
     ResponseEntity<String> createServicesInfo(@RequestBody ServicesInfoCreateRequest request ){
@@ -42,12 +49,7 @@ public class ServicesInfoController {
         return ResponseEntity.ok().body(servicesInfoResponse);
     }
 
-    @GetMapping("/barber/{id}")
-    public List<ServicesInfoBarberIdResponse> getByBarberId(@PathVariable Long id) {
-        return servicesInfoService.getServicesByBarberId(id);
-        
-        
-    }
+   
     
     
     
