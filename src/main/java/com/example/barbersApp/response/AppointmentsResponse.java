@@ -15,6 +15,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AppointmentsResponse {
-    private List<Appointments> appointments;
+    private Appointments appointments;
 
 }

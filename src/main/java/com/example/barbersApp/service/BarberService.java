@@ -18,7 +18,9 @@ import com.example.barbersApp.response.FamousBarbers;
 public interface BarberService {
 
 
-    AuthenticationResponse register(CreateBarberRequest request);
+    Object getSearchByName = null;
+
+	AuthenticationResponse register(CreateBarberRequest request);
 
     AuthenticationResponse authenticate(AuthenticationRequest request);
 
@@ -31,6 +33,8 @@ public interface BarberService {
     BarberResponse getBarberByEmail(String email);
 
     List<FamousBarbers> getFamousBarberByRating();
+
+    List<BarberDetailResponse> getBySearchName(String name);
 
 
 }

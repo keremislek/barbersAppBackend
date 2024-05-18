@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -18,7 +19,6 @@ import com.example.barbersApp.request.CreateBarberRequest;
 import com.example.barbersApp.response.AuthenticationResponse;
 import com.example.barbersApp.response.BarberDetailResponse;
 import com.example.barbersApp.response.BarberResponse;
-import com.example.barbersApp.response.BarberTop5Query;
 import com.example.barbersApp.response.FamousBarbers;
 import com.example.barbersApp.service.BarberService;
 
@@ -65,6 +65,11 @@ public class BarberController {
 	@GetMapping("/famous")
 	public ResponseEntity<List<FamousBarbers>> getFamousBarberByRating(){
 		return ResponseEntity.ok().body(barberService.getFamousBarberByRating());
+	}
+
+	@GetMapping("/search")
+	public ResponseEntity<List<BarberDetailResponse>> getSearchByName(@RequestParam String name){
+		return ResponseEntity.ok().body(barberService.getBySearchName(name));
 	}
 	
 	

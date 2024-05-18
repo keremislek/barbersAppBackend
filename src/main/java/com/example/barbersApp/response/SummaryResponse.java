@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServicesInfoBarberIdResponse {
-    private long id;
-    private String serviceName;
-    private int time;
-    private double price;
+public class SummaryResponse {
+    Long id;
+    Long appointmentId;
+    Long serviceId;
+    Long userId;
 }

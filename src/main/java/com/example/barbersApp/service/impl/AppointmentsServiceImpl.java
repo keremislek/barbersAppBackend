@@ -3,18 +3,29 @@ package com.example.barbersApp.service.impl;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import com.example.barbersApp.entities.AdressesInfo;
+import com.example.barbersApp.entities.AppointmentSummary;
 import com.example.barbersApp.entities.Appointments;
 import com.example.barbersApp.entities.Barber;
+import com.example.barbersApp.entities.Comment;
+import com.example.barbersApp.entities.Rating;
 import com.example.barbersApp.repository.AddressesInfoRepository;
 import com.example.barbersApp.repository.AppointmentRepository;
+import com.example.barbersApp.repository.AppointmentSummaryRepository;
 import com.example.barbersApp.repository.BarberRepository;
+import com.example.barbersApp.repository.CommentRepository;
+import com.example.barbersApp.repository.RatingRepository;
 import com.example.barbersApp.request.AppointmentsRequest;
+import com.example.barbersApp.request.SummaryRequest;
 import com.example.barbersApp.response.AppointmentsResponse;
 import com.example.barbersApp.response.AvaliableAppointmentHours;
 import com.example.barbersApp.response.BarberDetailResponse;
+import com.example.barbersApp.response.SummaryResponse;
 import com.example.barbersApp.service.AppointmentsService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -23,6 +34,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import scala.annotation.meta.field;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +43,9 @@ public class AppointmentsServiceImpl implements AppointmentsService {
     private final AppointmentRepository appointmentRepository;
     private final BarberRepository barberRepository;
     private final AddressesInfoRepository addressesInfoRepository;
+    private final AppointmentSummaryRepository appointmentSummaryRepository;
+    private final RatingRepository ratingRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public Appointments getAppointmentsById(Long id) {
@@ -41,24 +56,32 @@ public class AppointmentsServiceImpl implements AppointmentsService {
     @Override
     public AppointmentsResponse createOrUpdateAppointments(AppointmentsRequest request) {
         AppointmentsResponse appointmentsResponse = new AppointmentsResponse();
-        List<Appointments> appointmentsList = new ArrayList<>();
         Appointments appointments = new Appointments();
-        for (Long serviceId : request.getServiceIdList()) {
-            appointments = appointmentRepository.findAppointmentsWithParams(request.getUserId(), request.getBarberId(),
-                    serviceId, request.getDate());
-            if (appointments != null) {
-                updateAppointmentsIfNeeded(request, appointments);
-                appointmentRepository.save(appointments);
 
-            } else {
-                appointments = convertToAppointments(request, serviceId);
-                appointmentRepository.save(appointments);
-            }
+        appointments = appointmentRepository.findAppointmentsWithParams(request.getBarberId(),request.getDate());
+        if (appointments != null) {
+            updateAppointmentsIfNeeded(request, appointments);
+            appointmentRepository.save(appointments);
 
-            appointmentsList.add(appointments);
-
+        } else {
+            appointments = convertToAppointments(request);
+            appointmentRepository.save(appointments);
         }
-        appointmentsResponse.setAppointments(appointmentsList);
+        
+
+        for (Long serviceId : request.getServiceIds()){
+            AppointmentSummary appointmentSummary = new AppointmentSummary();
+            appointmentSummary.setAppointmentId(appointments.getId());
+            appointmentSummary.setServiceId(serviceId);
+            appointmentSummary.setUserId(request.getUserId());
+
+            appointmentSummaryRepository.save(appointmentSummary);
+        }
+
+
+
+        appointmentsResponse.setAppointments(appointments);
+   
 
         return appointmentsResponse;
     }
@@ -102,11 +125,9 @@ public class AppointmentsServiceImpl implements AppointmentsService {
         }
     }
 
-    public static Appointments convertToAppointments(AppointmentsRequest request, Long serviceId) {
+    public static Appointments convertToAppointments(AppointmentsRequest request) {
         Appointments appointments = new Appointments();
-        appointments.setUserId(request.getUserId());
         appointments.setBarberId(request.getBarberId());
-        appointments.setServiceId(serviceId);
         appointments.setDate(request.getDate());
         appointments.setT1(request.getT1());
         appointments.setT2(request.getT2());
@@ -125,39 +146,37 @@ public class AppointmentsServiceImpl implements AppointmentsService {
 
     @Override
     public AvaliableAppointmentHours getAvaliableAppointment(Long id) {
-        List<Appointments> appointments = appointmentRepository.findByBarberId(id);
+        Appointments appointments = appointmentRepository.findByBarberId(id);
 
-        if (appointments == null || appointments.isEmpty()) {
+        if (appointments == null) {
             return AvaliableAppointmentHours.builder()
-                    .t1("false")
-                    .t2("false")
-                    .t3("false")
-                    .t4("false")
-                    .t5("false")
-                    .t6("false")
-                    .t7("false")
-                    .t8("false")
-                    .t9("false")
-                    .t10("false")
-                    .t11("false")
-                    .t12("false")
+                    .t1("F")
+                    .t2("F")
+                    .t3("F")
+                    .t4("F")
+                    .t5("F")
+                    .t6("F")
+                    .t7("F")
+                    .t8("F")
+                    .t9("F")
+                    .t10("F")
+                    .t11("F")
+                    .t12("F")
                     .build();
         } else {
             AvaliableAppointmentHours avaliableAppointmentHours = new AvaliableAppointmentHours();
-            int size=appointments.size();
-            Appointments firstAppointments = appointments.get(size-1);
-            avaliableAppointmentHours.setT1(firstAppointments.getT1());
-            avaliableAppointmentHours.setT2(firstAppointments.getT2());
-            avaliableAppointmentHours.setT3(firstAppointments.getT3());
-            avaliableAppointmentHours.setT4(firstAppointments.getT4());
-            avaliableAppointmentHours.setT5(firstAppointments.getT5());
-            avaliableAppointmentHours.setT6(firstAppointments.getT6());
-            avaliableAppointmentHours.setT7(firstAppointments.getT7());
-            avaliableAppointmentHours.setT8(firstAppointments.getT8());
-            avaliableAppointmentHours.setT9(firstAppointments.getT9());
-            avaliableAppointmentHours.setT10(firstAppointments.getT10());
-            avaliableAppointmentHours.setT11(firstAppointments.getT11());
-            avaliableAppointmentHours.setT12(firstAppointments.getT12());
+            avaliableAppointmentHours.setT1(appointments.getT1());
+            avaliableAppointmentHours.setT2(appointments.getT2());
+            avaliableAppointmentHours.setT3(appointments.getT3());
+            avaliableAppointmentHours.setT4(appointments.getT4());
+            avaliableAppointmentHours.setT5(appointments.getT5());
+            avaliableAppointmentHours.setT6(appointments.getT6());
+            avaliableAppointmentHours.setT7(appointments.getT7());
+            avaliableAppointmentHours.setT8(appointments.getT8());
+            avaliableAppointmentHours.setT9(appointments.getT9());
+            avaliableAppointmentHours.setT10(appointments.getT10());
+            avaliableAppointmentHours.setT11(appointments.getT11());
+            avaliableAppointmentHours.setT12(appointments.getT12());
 
             return avaliableAppointmentHours;
         }
@@ -183,6 +202,17 @@ public class AppointmentsServiceImpl implements AppointmentsService {
     }
 
     private BarberDetailResponse mapToBarberResponse(Barber barber) {
+        List<Rating> ratings=ratingRepository.findByBarberId(Optional.of(barber.getId()));
+        List<Comment> comments = commentRepository.findByBarberId(barber.getId());
+
+        double avg = 0;
+        if (!ratings.isEmpty()) {
+            for (Rating rating : ratings) {
+                avg += rating.getRate();
+            }
+            avg /= ratings.size();
+        }
+        
         String fullAddress = null;
         if (barber.getAddressesInfo() != null) {
             fullAddress = barber.getAddressesInfo().getFullAddress();
@@ -194,6 +224,8 @@ public class AppointmentsServiceImpl implements AppointmentsService {
                 .id(barber.getId())
                 .photoUrl(barber.getPhotoUrl())
                 .address(fullAddress)
+                .rate(avg)
+                .commentSize(comments.size())
                 .build();
     }
 
@@ -260,6 +292,51 @@ public class AppointmentsServiceImpl implements AppointmentsService {
 
         return barbersResponse;
 
+    }
+
+    @Override
+    public List<SummaryResponse> getAppointmentSummary(SummaryRequest request) {
+        List<SummaryResponse> responses = appointmentSummaryRepository.findByAppointmentIdAndUserId(request.getAppointmentId(), request.getUserId());
+        return responses;
+    }
+
+    @Override
+    public AvaliableAppointmentHours getAvaliableAppointmentByDate(Long id) {
+        Appointments appointments = new Appointments();
+        AvaliableAppointmentHours avaliableAppointmentHours = new AvaliableAppointmentHours();
+        appointments = appointmentRepository.findAppointmentsWithParams(id, LocalDate.now());
+
+        if (appointments == null) {
+            return AvaliableAppointmentHours.builder()
+                    .t1("F")
+                    .t2("F")
+                    .t3("F")
+                    .t4("F")
+                    .t5("F")
+                    .t6("F")
+                    .t7("F")
+                    .t8("F")
+                    .t9("F")
+                    .t10("F")
+                    .t11("F")
+                    .t12("F")
+                    .build();
+        } else {
+            
+            avaliableAppointmentHours.setT1(appointments.getT1());
+            avaliableAppointmentHours.setT2(appointments.getT2());
+            avaliableAppointmentHours.setT3(appointments.getT3());
+            avaliableAppointmentHours.setT4(appointments.getT4());
+            avaliableAppointmentHours.setT5(appointments.getT5());
+            avaliableAppointmentHours.setT6(appointments.getT6());
+            avaliableAppointmentHours.setT7(appointments.getT7());
+            avaliableAppointmentHours.setT8(appointments.getT8());
+            avaliableAppointmentHours.setT9(appointments.getT9());
+            avaliableAppointmentHours.setT10(appointments.getT10());
+            avaliableAppointmentHours.setT11(appointments.getT11());
+            avaliableAppointmentHours.setT12(appointments.getT12());
+        }
+        return avaliableAppointmentHours;
     }
 
 }

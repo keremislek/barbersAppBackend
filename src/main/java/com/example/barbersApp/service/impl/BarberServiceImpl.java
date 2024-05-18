@@ -45,6 +45,7 @@ public class BarberServiceImpl implements BarberService {
 	 RatingRepository ratingRepository;
 	 CommentRepository commentRepository;
 	 BarberTop5Query barberTop5Query;
+	 
 
 	
 	public BarberServiceImpl(BarberRepository barberRepository,PasswordEncoder passwordEncoder,JwtService jwtService,AuthenticationManager authenticationManager, RatingRepository ratingRepository,
@@ -80,7 +81,8 @@ public class BarberServiceImpl implements BarberService {
 
 		var user= barberRepository.findByEmail(request.getEmail()).get();
 		var jwtToken=jwtService.generateToken(user);
-		return AuthenticationResponse.builder().token(jwtToken).build();
+		return AuthenticationResponse.builder().token(jwtToken).id(user.getId())
+		.build();
 	}
 
 	
@@ -110,7 +112,7 @@ public class BarberServiceImpl implements BarberService {
 	public BarberDetailResponse getBarberById(Long id) {
 		var barber=barberRepository.findById(id).orElseThrow(()->new EntityNotFoundException("barber not found by id: "+id));
 		List<Rating> ratings = ratingRepository.findByBarberId(Optional.of(id));
-		List<Comment> comments= commentRepository.findByBarberId(Optional.of(id));
+		List<Comment> comments= commentRepository.findByBarberId(id);
 
 		
 		double avg=0;
@@ -173,6 +175,8 @@ public class BarberServiceImpl implements BarberService {
 	for (BarberTop5Query query : famousBarber) {
 		Long barberId=query.getBarberId();
 		Barber barber=barberRepository.findById(barberId).orElseThrow(()->new EntityNotFoundException("Barber not found with id : "+barberId));
+		
+
 		barbers.add(barber);
 	}
 
@@ -183,9 +187,11 @@ public class BarberServiceImpl implements BarberService {
 private List<FamousBarbers> mapToFamousBarbers(List<Barber> barbers, List<BarberTop5Query> famousBarber){
     List<FamousBarbers> famousBarbers = new ArrayList<>();
 
-    for (int i = 0; i < barbers.size(); i++) {
+	for (int i = 0; i < barbers.size(); i++) {
         Barber barber = barbers.get(i);
         BarberTop5Query query = famousBarber.get(i);
+		
+		List<Comment> comments= commentRepository.findByBarberId(barber.getId());
         
         FamousBarbers topBarber = new FamousBarbers();
         topBarber.setBarberId(barber.getId());
@@ -193,11 +199,49 @@ private List<FamousBarbers> mapToFamousBarbers(List<Barber> barbers, List<Barber
         topBarber.setBarberName(barber.getBarberName());
         topBarber.setBarberAddress(barber.getAddress());
         topBarber.setRate(query.getAvgRate()); // set the rate from BarberTop5Query
-        
+        topBarber.setCommentSize(comments.size());
         famousBarbers.add(topBarber);
     }
 
     return famousBarbers;
+}
+
+@Override
+public List<BarberDetailResponse> getBySearchName(String name) {
+	
+	List<Barber> barbers= barberRepository.findByNameToDatabase(name);
+	List<BarberDetailResponse> barberDetails= new ArrayList<>();
+
+	for (Barber barber : barbers) {
+		Long id = barber.getId();
+		List<Rating> ratings = ratingRepository.findByBarberId(id);
+		List<Comment> comments = commentRepository.findByBarberId(id);
+
+		double avg = 0;
+		if (!ratings.isEmpty()) {
+			for (Rating rating : ratings) {
+				avg += rating.getRate();
+			}
+			avg /= ratings.size();
+		}
+
+		String fullAddress = barber.getAddressesInfo() != null ? barber.getAddressesInfo().getFullAddress() : "Bilinmeyen Adres";
+
+		BarberDetailResponse barberDetailResponse = BarberDetailResponse.builder()
+				.id(id)
+				.address(fullAddress)
+				.barberName(barber.getBarberName())
+				.services(barber.getServices())
+				.photoUrl(barber.getPhotoUrl())
+				.rate(avg)
+				.commentSize(comments.size())
+				.build();
+
+		barberDetails.add(barberDetailResponse);
+	}
+
+	return barberDetails;
+	
 }
 
 }

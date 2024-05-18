@@ -15,5 +15,8 @@ import com.example.barbersApp.response.FamousBarbers;
 public interface BarberRepository extends JpaRepository<Barber, Long> {
 	Optional<Barber> findByEmail(String email);
 
+	@Query("SELECT b FROM Barber b WHERE LOWER(b.barberName) LIKE LOWER(CONCAT('%', :name, '%'))")
+    List<Barber> findByNameToDatabase(String name);
+
 	
 }

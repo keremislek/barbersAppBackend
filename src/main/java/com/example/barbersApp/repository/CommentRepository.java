@@ -11,10 +11,14 @@ import com.example.barbersApp.entities.Comment;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment,Long>{
 
-    List<Comment> findByCustomerIdAndBarberId(Optional<Long> customerId, Optional<Long> barberId);
+    List<Comment> findByCustomerIdAndBarberId(Long customerId, Long barberId);
 
-    List<Comment> findByCustomerId(Optional<Long> customerId);
+    List<Comment> findByCustomerId(Long customerId);
 
-    List<Comment> findByBarberId(Optional<Long> barberId);
+    List<Comment> findByBarberId(Long barberId);
+
+  
+    
+
 
 }

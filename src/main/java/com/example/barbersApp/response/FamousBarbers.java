@@ -15,4 +15,5 @@ public class FamousBarbers {
     private String barberName;
     private String barberAddress;
     private Double rate;
+    private int commentSize;
 }

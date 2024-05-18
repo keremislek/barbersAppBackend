@@ -12,9 +12,9 @@ import com.example.barbersApp.entities.Appointments;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointments, Long> {
-    @Query("SELECT a FROM Appointments a WHERE a.userId = :userId AND a.barberId = :barberId AND a.serviceId = :serviceId AND a.date = :date")
-    Appointments findAppointmentsWithParams(@Param("userId") Long userId, @Param("barberId") Long barberId, @Param("serviceId") Long serviceId, @Param("date") LocalDate date);
+    @Query("SELECT a FROM Appointments a WHERE a.barberId = :barberId AND a.date = :date")
+    Appointments findAppointmentsWithParams(@Param("barberId") Long barberId,  @Param("date") LocalDate date);
 
-    List<Appointments> findByBarberId(Long id);
+    Appointments findByBarberId(Long id);
     List<Appointments> findByDate(LocalDate date);
 }
