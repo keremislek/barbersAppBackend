@@ -12,4 +12,6 @@ import com.example.barbersApp.entities.ServicesInfo;
 @Repository
 public interface ServicesInfoRepository extends JpaRepository<ServicesInfo,Long>{
     List<ServicesInfo> findByBarberId(Long id); 
+    Optional<ServicesInfo> findByBarberIdAndServicesId(Long barberId, Long servicesId);
+
 }

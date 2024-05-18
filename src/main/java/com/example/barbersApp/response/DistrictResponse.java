@@ -1,17 +1,15 @@
 package com.example.barbersApp.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServicesInfoBarberIdResponse {
-    private long id;
-    private String serviceName;
-    private int time;
-    private double price;
+public class DistrictResponse {
+    private Long id;
+    private String name;
 }

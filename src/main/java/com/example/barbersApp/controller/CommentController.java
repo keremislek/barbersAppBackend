@@ -32,12 +32,13 @@ public class CommentController {
     }
 
     @GetMapping
-    public List<CommentResponse> getAllComments(@RequestParam Optional<Long> customerId, @RequestParam Optional<Long> barberId){
-        return commentService.getAllCommentWithsParam(customerId,barberId);
+    public List<CommentResponse> getAllComments(){
+        return commentService.getAllComment();
     }
 
-    @GetMapping("/barber")
-    public List<CommentResponse> getAllCommentByBarber(@RequestParam Optional<Long> barberId){
+    @GetMapping("/barber/{barberId}")
+    public List<CommentResponse> getAllCommentByBarber(@PathVariable Long barberId){
+        
         return commentService.getAllCommentByBarber(barberId);
     } 
 
@@ -62,4 +63,6 @@ public class CommentController {
         commentService.deleteComment(commentId);
         return ResponseEntity.ok().body("Comment deleted with id: "+commentId);
     }
+
+ 
 }

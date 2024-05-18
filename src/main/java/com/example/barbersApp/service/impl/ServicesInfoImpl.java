@@ -30,21 +30,22 @@ public class ServicesInfoImpl implements ServicesInfoService{
     @Override
     public ServicesInfo createServicesInfo(ServicesInfoCreateRequest request) {
         ServicesInfo newServicesInfo=new ServicesInfo();
-        newServicesInfo.setPrice(request.getPrice());
-        newServicesInfo.setTime(request.getTime());
+        var serviceInfo = servicesInfoRepository.findByBarberIdAndServicesId(request.getBarberId(), request.getServiceId())
+        .orElse(newServicesInfo);
+
+        serviceInfo.setPrice(request.getPrice());
+        serviceInfo.setTime(request.getTime());
         Barber barber = barberRepository.findById(request.getBarberId())
             .orElseThrow(() -> new RuntimeException("Barber not found with id: " + request.getBarberId()));
         
         Services services = serviceRepository.findById(request.getServiceId())
             .orElseThrow(() -> new RuntimeException("Service not found with id: " + request.getServiceId()));
 
-        newServicesInfo.setBarber(barber);
-        newServicesInfo.setServices(services);
+        serviceInfo.setBarber(barber);
+        serviceInfo.setServices(services);
 
-        ServicesInfo createdServicesInfo=servicesInfoRepository.save(newServicesInfo);
+        ServicesInfo createdServicesInfo=servicesInfoRepository.save(serviceInfo);
         return createdServicesInfo;   
-    
-       
     }
 
     @Override
@@ -72,6 +73,7 @@ public class ServicesInfoImpl implements ServicesInfoService{
         return ServicesInfoBarberIdResponse.builder().time(servicesInfo.getTime())
         .price(servicesInfo.getPrice())
         .serviceName(servicesInfo.getServices().getServiceName())
+        .id(servicesInfo.getId())
         .build();
     }
 

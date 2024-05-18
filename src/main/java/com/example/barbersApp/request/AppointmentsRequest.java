@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 public class AppointmentsRequest {
     private Long userId;
     private Long barberId;
-    private List<Long> serviceIdList;
     private LocalDate date;
+    private List<Long> serviceIds;
     private String t1;
     private String t2;
     private String t3;
