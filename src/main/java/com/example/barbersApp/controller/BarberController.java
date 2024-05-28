@@ -5,9 +5,11 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.barbersApp.request.AuthenticationRequest;
 import com.example.barbersApp.request.CreateBarberRequest;
+import com.example.barbersApp.request.UpdateEmailAndPassword;
 import com.example.barbersApp.response.AuthenticationResponse;
 import com.example.barbersApp.response.BarberDetailResponse;
 import com.example.barbersApp.response.BarberResponse;
@@ -71,7 +74,20 @@ public class BarberController {
 	public ResponseEntity<List<BarberDetailResponse>> getSearchByName(@RequestParam String name){
 		return ResponseEntity.ok().body(barberService.getBySearchName(name));
 	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteBarber(@PathVariable Long id){
+		barberService.deleteBarberById(id);
+		return ResponseEntity.noContent().build();
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<Void> updateBarberEmailAndPassword(@PathVariable Long id, @RequestBody UpdateEmailAndPassword request){
+		barberService.updateBarberEmailAndPassword(id,request.getEmail(),request.getPassword());
+		return ResponseEntity.noContent().build();
+	}
 	
+
 	
 	
 	

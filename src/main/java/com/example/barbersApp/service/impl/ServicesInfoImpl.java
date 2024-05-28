@@ -77,6 +77,12 @@ public class ServicesInfoImpl implements ServicesInfoService{
         .build();
     }
 
+    @Override
+    public void deleteServicesInfoById(Long id) {
+        ServicesInfo serviceInfo=servicesInfoRepository.findById(id).orElseThrow(()->new EntityNotFoundException("ServicesInfo not found with id : "+id));
+        servicesInfoRepository.delete(serviceInfo);
+    }
+
     
     
     

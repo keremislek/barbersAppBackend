@@ -11,7 +11,7 @@ import com.example.barbersApp.response.SummaryResponse;
 import scala.Long;
 
 @Repository
-public interface AppointmentSummaryRepository extends JpaRepository<AppointmentSummary,Long>{
+public interface AppointmentSummaryRepository extends JpaRepository<AppointmentSummary, Long>{
 
     List<SummaryResponse> findByAppointmentIdAndUserId(Long appointmentId, Long userId);
 

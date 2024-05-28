@@ -9,6 +9,7 @@ import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import com.example.barbersApp.entities.AdressesInfo;
+import com.example.barbersApp.entities.AppointmentStatus;
 import com.example.barbersApp.entities.AppointmentSummary;
 import com.example.barbersApp.entities.Appointments;
 import com.example.barbersApp.entities.Barber;
@@ -57,23 +58,30 @@ public class AppointmentsServiceImpl implements AppointmentsService {
     public AppointmentsResponse createOrUpdateAppointments(AppointmentsRequest request) {
         AppointmentsResponse appointmentsResponse = new AppointmentsResponse();
         Appointments appointments = new Appointments();
+        Appointments savedApointments = new Appointments();
 
         appointments = appointmentRepository.findAppointmentsWithParams(request.getBarberId(),request.getDate());
         if (appointments != null) {
             updateAppointmentsIfNeeded(request, appointments);
-            appointmentRepository.save(appointments);
+            savedApointments =appointmentRepository.save(appointments);
 
         } else {
             appointments = convertToAppointments(request);
-            appointmentRepository.save(appointments);
+            savedApointments = appointmentRepository.save(appointments);
         }
         
 
         for (Long serviceId : request.getServiceIds()){
             AppointmentSummary appointmentSummary = new AppointmentSummary();
-            appointmentSummary.setAppointmentId(appointments.getId());
+            appointmentSummary.setAppointmentId(savedApointments.getId());
             appointmentSummary.setServiceId(serviceId);
             appointmentSummary.setUserId(request.getUserId());
+            appointmentSummary.setDate(request.getDate());
+            appointmentSummary.setStatus(AppointmentStatus.PENDING);
+            String timeField = request.getTimeFieldWithB();
+            if (timeField != null) {
+                appointmentSummary.setTime(timeField);
+            }
 
             appointmentSummaryRepository.save(appointmentSummary);
         }
@@ -145,8 +153,8 @@ public class AppointmentsServiceImpl implements AppointmentsService {
     }
 
     @Override
-    public AvaliableAppointmentHours getAvaliableAppointment(Long id) {
-        Appointments appointments = appointmentRepository.findByBarberId(id);
+    public AvaliableAppointmentHours getAvaliableAppointment(Long id, LocalDate date) {
+        Appointments appointments = appointmentRepository.findByBarberIdAndDate(id,date);
 
         if (appointments == null) {
             return AvaliableAppointmentHours.builder()
@@ -250,7 +258,7 @@ public class AppointmentsServiceImpl implements AppointmentsService {
         
         List<Long> barbersToRemove = new ArrayList<>();
         for (Long barberId : barbersId) {
-            AvaliableAppointmentHours availableAppointmentHours = getAvaliableAppointment(barberId);
+            AvaliableAppointmentHours availableAppointmentHours = getAvaliableAppointment(barberId,date);
             List<String> timeList = new ArrayList<>();
             timeList.add(availableAppointmentHours.getT1());
             timeList.add(availableAppointmentHours.getT2());

@@ -78,6 +78,22 @@ public class CustomerServiceImpl implements CustomerService{
 
 	}
 
+	@Override
+	public void deleteCustomerById(Long id) {
+		if(!customerRepository.existsById(id)){
+			throw new UnsupportedOperationException("Unimplemented method 'deleteCustomerById'");
+		}
+		customerRepository.deleteById(id);
+	}
+
+	@Override
+	public void updateCustomerEmailAndPassword(Long id, String email, String password) {
+		Customer customer=customerRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Customer not found by id : "+id));
+		customer.setEmail(email);
+		customer.setPassword(passwordEncoder.encode(password));
+		customerRepository.save(customer);
+	}
+
 
 
 }

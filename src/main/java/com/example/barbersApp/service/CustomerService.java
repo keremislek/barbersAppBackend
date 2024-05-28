@@ -17,4 +17,8 @@ public interface CustomerService {
 
     CustomerDetailResponse getCustomerById(Long id);
 
+    void deleteCustomerById(Long id);
+
+    void updateCustomerEmailAndPassword(Long id, String email, String password);
+
 }

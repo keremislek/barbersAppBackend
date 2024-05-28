@@ -47,8 +47,8 @@ public class AppointmentController {
     }
 
     @GetMapping("/available/{id}")
-    public AvaliableAppointmentHours getAvaliableAppointment(@PathVariable Long id){
-        return appointmentsService.getAvaliableAppointment(id);
+    public AvaliableAppointmentHours getAvaliableAppointment(@PathVariable Long id, @RequestParam(name="date") LocalDate date){
+        return appointmentsService.getAvaliableAppointment(id,date);
     }
 
     @GetMapping("/{id}")

@@ -30,4 +30,22 @@ public class AppointmentsRequest {
     private String t11;
     private String t12;
 
+
+
+    public String getTimeFieldWithB() {
+        if ("P".equals(t1)) return "t1";
+        if ("P".equals(t2)) return "t2";
+        if ("P".equals(t3)) return "t3";
+        if ("P".equals(t4)) return "t4";
+        if ("P".equals(t5)) return "t5";
+        if ("P".equals(t6)) return "t6";
+        if ("P".equals(t7)) return "t7";
+        if ("P".equals(t8)) return "t8";
+        if ("P".equals(t9)) return "t9";
+        if ("P".equals(t10)) return "t10";
+        if ("P".equals(t11)) return "t11";
+        if ("P".equals(t12)) return "t12";
+        return null; // P değeri bulunmazsa null döner
+    }
+
 }

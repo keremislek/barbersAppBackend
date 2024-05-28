@@ -1,5 +1,8 @@
 package com.example.barbersApp.entities;
 
+import java.time.LocalDate;
+
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,4 +20,9 @@ public class AppointmentSummary {
     Long appointmentId;
     Long serviceId;
     Long userId;
+    @Convert(converter = AppointmentStatusConverter.class)
+    private AppointmentStatus status;
+    LocalDate date;
+    String time;
+    
 }

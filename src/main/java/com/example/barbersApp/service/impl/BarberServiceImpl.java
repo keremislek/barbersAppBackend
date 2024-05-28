@@ -153,7 +153,7 @@ public class BarberServiceImpl implements BarberService {
 
 	@Override
 	public List<FamousBarbers> getFamousBarberByRating() {
-    List<Object[]> results = ratingRepository.findfamousByRating(PageRequest.of(0, 6));
+    List<Object[]> results = ratingRepository.findfamousByRating(PageRequest.of(0, 4));
     
     List<BarberTop5Query> famousBarber = new ArrayList<>();
 	List<Barber> barbers= new ArrayList<>();
@@ -243,5 +243,25 @@ public List<BarberDetailResponse> getBySearchName(String name) {
 	return barberDetails;
 	
 }
+
+@Override
+public void deleteBarberById(Long id) {
+	
+	if(barberRepository.existsById(id)){
+		throw new EntityNotFoundException("Barber not found by id : "+id);
+	}
+
+	barberRepository.deleteById(id);
+}
+
+@Override
+public void updateBarberEmailAndPassword(Long id, String email, String password) {
+	Barber barber=barberRepository.findById(id).orElseThrow(()->new EntityNotFoundException("barber not found by id : "+id));
+	barber.setEmail(email);
+	barber.setPassword(passwordEncoder.encode(password));
+	barberRepository.save(barber);
+}
+
+
 
 }

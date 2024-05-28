@@ -69,4 +69,24 @@ public class AddressesInfoServiceImpl implements AddressesInfoService{
         .build();
     }
 
+    @Override
+    public void updateAddressInfo(Long id, AddressInfoCreateRequest request) {
+        AdressesInfo addressesInfo=addressesInfoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Address not found by id: " + id));
+        addressesInfo.setFullAddress(request.getFullAddress());
+
+        Barber barber=barberRepository.findById(request.getBarberId()).orElseThrow(() -> new EntityNotFoundException("Barber not found by id: " + id));
+        District district=districtRepository.findById(request.getDistrictId()).orElseThrow(() -> new EntityNotFoundException("District not found by id: " + id));
+
+        addressesInfo.setBarber(barber);
+        addressesInfo.setDistrict(district);
+
+        addressesInfoRepository.save(addressesInfo);
+    }
+
+    @Override
+    public void deleteAddressInfoById(Long id) {
+        AdressesInfo adressesInfo=addressesInfoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Address not found by id: " + id));
+        addressesInfoRepository.delete(adressesInfo);
+    }
+
 }

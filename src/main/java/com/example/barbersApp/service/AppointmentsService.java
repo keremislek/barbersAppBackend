@@ -18,7 +18,7 @@ public interface AppointmentsService {
 
     Appointments getAppointmentsById(Long id);
     AppointmentsResponse createOrUpdateAppointments(AppointmentsRequest request);
-    AvaliableAppointmentHours getAvaliableAppointment(Long id);
+    AvaliableAppointmentHours getAvaliableAppointment(Long id,LocalDate date);
     AvaliableAppointmentHours getAvaliableAppointmentByDate(Long id);
     List<BarberDetailResponse> getAvaliableByDistrict(Long id);
     List<BarberDetailResponse> getAvailableByDate(LocalDate date);

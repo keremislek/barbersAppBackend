@@ -10,8 +10,10 @@ import java.util.function.Function;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+
+
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -37,6 +39,8 @@ public class JwtService {
 	  
 	public String generateToken(Map<String, Object> extraClaims,UserDetails userDetails) 
 	{
+		
+
 		extraClaims.put("role", userDetails.getAuthorities());
 		
 

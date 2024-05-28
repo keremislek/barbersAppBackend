@@ -10,13 +10,8 @@ import com.example.barbersApp.response.ServicesInfoResponse;
 public interface ServicesInfoService {
     
     ServicesInfo createServicesInfo(ServicesInfoCreateRequest request);
-
-    
-
     ServicesInfoResponse getServicesInfoById(Long id);
-
-
-
     List<ServicesInfoBarberIdResponse> getServicesByBarberId(Long id);
+    void deleteServicesInfoById(Long id);
 
 }

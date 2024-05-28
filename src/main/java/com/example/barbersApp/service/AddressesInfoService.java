@@ -15,4 +15,8 @@ public interface AddressesInfoService {
 
     List<AddressInfoBarberIdResponse> getAddressInfoByBarberId(Long id);
 
+    void updateAddressInfo(Long id, AddressInfoCreateRequest request);
+
+    void deleteAddressInfoById(Long id);
+
 }

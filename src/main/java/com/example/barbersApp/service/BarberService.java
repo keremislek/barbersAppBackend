@@ -36,5 +36,9 @@ public interface BarberService {
 
     List<BarberDetailResponse> getBySearchName(String name);
 
+    void deleteBarberById(Long id);
+
+    void updateBarberEmailAndPassword(Long id, String email, String password);
+
 
 }

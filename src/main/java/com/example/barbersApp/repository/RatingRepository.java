@@ -23,7 +23,7 @@ public interface RatingRepository extends JpaRepository<Rating,Long>{
 
     
 
-    @Query("SELECT barber.id, AVG(rate) AS avgrate FROM Rating r GROUP BY r.barber.id ORDER BY avgrate DESC")
+    @Query("SELECT barber.id, AVG(rate) AS avgrate FROM Rating r GROUP BY r.barber.id ORDER BY avgrate DESC LIMIT 5")
     List<Object []> findfamousByRating(Pageable pageable);
 
 
