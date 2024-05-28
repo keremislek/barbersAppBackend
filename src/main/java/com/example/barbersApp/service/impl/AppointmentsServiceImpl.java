@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
@@ -14,23 +17,31 @@ import com.example.barbersApp.entities.AppointmentSummary;
 import com.example.barbersApp.entities.Appointments;
 import com.example.barbersApp.entities.Barber;
 import com.example.barbersApp.entities.Comment;
+import com.example.barbersApp.entities.Customer;
 import com.example.barbersApp.entities.Rating;
+import com.example.barbersApp.entities.Services;
+import com.example.barbersApp.entities.ServicesInfo;
 import com.example.barbersApp.repository.AddressesInfoRepository;
 import com.example.barbersApp.repository.AppointmentRepository;
 import com.example.barbersApp.repository.AppointmentSummaryRepository;
 import com.example.barbersApp.repository.BarberRepository;
 import com.example.barbersApp.repository.CommentRepository;
+import com.example.barbersApp.repository.CustomerRepository;
 import com.example.barbersApp.repository.RatingRepository;
+import com.example.barbersApp.repository.ServiceRepository;
+import com.example.barbersApp.repository.ServicesInfoRepository;
 import com.example.barbersApp.request.AppointmentsRequest;
 import com.example.barbersApp.request.SummaryRequest;
 import com.example.barbersApp.response.AppointmentsResponse;
 import com.example.barbersApp.response.AvaliableAppointmentHours;
 import com.example.barbersApp.response.BarberDetailResponse;
+import com.example.barbersApp.response.BarberSummaryResponse;
+import com.example.barbersApp.response.CustomerSummaryResponse;
 import com.example.barbersApp.response.SummaryResponse;
 import com.example.barbersApp.service.AppointmentsService;
 
 import jakarta.persistence.EntityNotFoundException;
-
+import jakarta.transaction.Transactional;
 
 import java.util.stream.Collectors;
 
@@ -47,6 +58,9 @@ public class AppointmentsServiceImpl implements AppointmentsService {
     private final AppointmentSummaryRepository appointmentSummaryRepository;
     private final RatingRepository ratingRepository;
     private final CommentRepository commentRepository;
+    private final ServiceRepository serviceRepository;
+    private final ServicesInfoRepository servicesInfoRepository;
+    private final CustomerRepository customerRepository;
 
     @Override
     public Appointments getAppointmentsById(Long id) {
@@ -95,43 +109,34 @@ public class AppointmentsServiceImpl implements AppointmentsService {
     }
 
     private void updateAppointmentsIfNeeded(AppointmentsRequest request, Appointments appointments) {
-        if (!"T".equals(appointments.getT1())) {
-            appointments.setT1(request.getT1());
-        }
-        if (!"T".equals(appointments.getT2())) {
-            appointments.setT2(request.getT2());
-        }
-        if (!"T".equals(appointments.getT3())) {
-            appointments.setT3(request.getT3());
-        }
-        if (!"T".equals(appointments.getT4())) {
-            appointments.setT4(request.getT4());
-        }
-        if (!"T".equals(appointments.getT5())) {
-            appointments.setT5(request.getT5());
-        }
-        if (!"T".equals(appointments.getT6())) {
-            appointments.setT6(request.getT6());
-        }
-        if (!"T".equals(appointments.getT7())) {
-            appointments.setT7(request.getT7());
-        }
-        if (!"T".equals(appointments.getT8())) {
-            appointments.setT8(request.getT8());
-        }
-        if (!"T".equals(appointments.getT9())) {
-            appointments.setT9(request.getT9());
-        }
-        if (!"T".equals(appointments.getT10())) {
-            appointments.setT10(request.getT10());
-        }
-        if (!"T".equals(appointments.getT11())) {
-            appointments.setT11(request.getT11());
-        }
-        if (!"T".equals(appointments.getT12())) {
-            appointments.setT12(request.getT12());
+        updateTFieldIfNeeded(appointments.getT1(), request.getT1(), newValue -> appointments.setT1(newValue));
+        updateTFieldIfNeeded(appointments.getT2(), request.getT2(), newValue -> appointments.setT2(newValue));
+        updateTFieldIfNeeded(appointments.getT3(), request.getT3(), newValue -> appointments.setT3(newValue));
+        updateTFieldIfNeeded(appointments.getT4(), request.getT4(), newValue -> appointments.setT4(newValue));
+        updateTFieldIfNeeded(appointments.getT5(), request.getT5(), newValue -> appointments.setT5(newValue));
+        updateTFieldIfNeeded(appointments.getT6(), request.getT6(), newValue -> appointments.setT6(newValue));
+        updateTFieldIfNeeded(appointments.getT7(), request.getT7(), newValue -> appointments.setT7(newValue));
+        updateTFieldIfNeeded(appointments.getT8(), request.getT8(), newValue -> appointments.setT8(newValue));
+        updateTFieldIfNeeded(appointments.getT9(), request.getT9(), newValue -> appointments.setT9(newValue));
+        updateTFieldIfNeeded(appointments.getT10(), request.getT10(), newValue -> appointments.setT10(newValue));
+        updateTFieldIfNeeded(appointments.getT11(), request.getT11(), newValue -> appointments.setT11(newValue));
+        updateTFieldIfNeeded(appointments.getT12(), request.getT12(), newValue -> appointments.setT12(newValue));
+    }
+    
+    private void updateTFieldIfNeeded(String currentValue, String newValue, SetterFunction setter) {
+        if ("B".equals(currentValue) || "B".equals(newValue)) {
+            setter.set("P");
+        } else if (!"T".equals(currentValue)) {
+            setter.set(newValue);
         }
     }
+    
+    
+    @FunctionalInterface
+    interface SetterFunction {
+        void set(String value);
+    }
+    
 
     public static Appointments convertToAppointments(AppointmentsRequest request) {
         Appointments appointments = new Appointments();
@@ -302,11 +307,7 @@ public class AppointmentsServiceImpl implements AppointmentsService {
 
     }
 
-    @Override
-    public List<SummaryResponse> getAppointmentSummary(SummaryRequest request) {
-        List<SummaryResponse> responses = appointmentSummaryRepository.findByAppointmentIdAndUserId(request.getAppointmentId(), request.getUserId());
-        return responses;
-    }
+
 
     @Override
     public AvaliableAppointmentHours getAvaliableAppointmentByDate(Long id) {
@@ -346,5 +347,173 @@ public class AppointmentsServiceImpl implements AppointmentsService {
         }
         return avaliableAppointmentHours;
     }
+    @Override
+    public List<CustomerSummaryResponse> getAppointmentSummary(Long userId, LocalDate date) {
+        List<AppointmentSummary> summaries=appointmentSummaryRepository.findByUserIdAndDate(userId,date);
+        
+        
+        List<Long> appointmentsIds=summaries.stream().map(AppointmentSummary::getAppointmentId)
+        .collect(Collectors.toList());
+        Long appointmentId=appointmentsIds.get(0);
+        
+        Appointments appointments=appointmentRepository.findById(appointmentId).orElse(null);
 
+        Long barberId=appointments.getBarberId();
+        Barber barber= barberRepository.findById(barberId).orElse(null);
+        Customer customer= customerRepository.findById(userId).orElse(null);
+
+        
+        Map<String, List<AppointmentSummary>> groupByDateAndTime=summaries.stream()
+        .collect(Collectors.groupingBy(summary->summary.getDate().toString()+summary.getTime()));
+
+        List<CustomerSummaryResponse> response= new ArrayList<>();
+
+        for(Map.Entry<String,List<AppointmentSummary>> entry : groupByDateAndTime.entrySet()){
+            List<AppointmentSummary> appointmentSummaries= entry.getValue();
+            if(!appointmentSummaries.isEmpty()){
+                CustomerSummaryResponse customerResponse= new CustomerSummaryResponse();
+                customerResponse.setBarberId(barberId);
+                customerResponse.setDate(appointmentSummaries.get(0).getDate());
+                customerResponse.setStatus(appointmentSummaries.get(0).getStatus());
+                customerResponse.setTime(appointmentSummaries.get(0).getTime());
+
+                String services= "";
+                for (AppointmentSummary summary : entry.getValue()) {
+                    ServicesInfo servicesInfo=servicesInfoRepository.findById(summary.getServiceId()).orElse(null);
+                    services +=(""+servicesInfo.getServices().getServiceName()+", ");
+                }
+                customerResponse.setServices(services);
+                customerResponse.setAppId(appointments.getId());
+                customerResponse.setBarberId(barberId);
+                customerResponse.setUserId(userId);
+                customerResponse.setBarberName(barber.getBarberName());
+                String customerName=(" "+customer.getFirstName()+" "+customer.getLastName()+" ");
+                customerResponse.setCustomerName(customerName);
+
+                response.add(customerResponse);
+            }
+        }
+
+        return response;
+    }
+
+
+    @Override
+    public List<BarberSummaryResponse> getBarberAppointmentSummary(Long barberId, LocalDate date) {
+        
+        Appointments appointments= appointmentRepository.findByBarberIdAndDate(barberId,date);
+        List<AppointmentSummary> summaries= appointmentSummaryRepository.findByAppointmentId(appointments.getId());
+        
+
+        Map<String, List<AppointmentSummary>> groupedByDateAndTime = summaries.stream()
+        .collect(Collectors.groupingBy(summary -> summary.getDate().toString() + summary.getTime()));
+
+        List<BarberSummaryResponse> response = new ArrayList<>();
+        
+       
+
+        for (Map.Entry<String, List<AppointmentSummary>> entry : groupedByDateAndTime.entrySet()) {
+            List<AppointmentSummary> appointmentSummaries = entry.getValue();
+            if (!appointmentSummaries.isEmpty()) {
+                BarberSummaryResponse barberResponse = new BarberSummaryResponse();
+                barberResponse.setBarberId(barberId);
+                barberResponse.setUserId(appointmentSummaries.get(0).getUserId()); // Assuming userId is same for each grouped appointment
+                barberResponse.setDate(appointmentSummaries.get(0).getDate());
+                barberResponse.setTime(appointmentSummaries.get(0).getTime());
+                barberResponse.setStatus(appointmentSummaries.get(0).getStatus());
+
+
+               String services="";
+               for (AppointmentSummary summary : entry.getValue()) {
+                    ServicesInfo servicesInfo=servicesInfoRepository.findById(summary.getServiceId()).orElse(null);
+                    
+                    services += (""+servicesInfo.getServices().getServiceName()+" - "); 
+               }
+            
+            barberResponse.setServices(services);
+            barberResponse.setAppId(appointments.getId());
+            response.add(barberResponse);
+            }
+        }
+        return response;
+
+        
+    }
+
+    @Override
+    @Transactional
+    public boolean updateAppointmentStatus(Long appointmentId, String time, String status) {
+        Optional<Appointments> optionalAppointment = appointmentRepository.findById(appointmentId);
+       
+        if (optionalAppointment.isPresent()) {
+            Appointments appointment = optionalAppointment.get();
+            String newValue = "F";
+            AppointmentStatus newStatus = AppointmentStatus.REJECTED;
+
+            if ("ACCEPTED".equalsIgnoreCase(status)) {
+                newValue = "T";
+                newStatus = AppointmentStatus.ACCEPTED;
+            }
+
+            switch (time) {
+                case "t1":
+                    if ("P".equals(appointment.getT1())) appointment.setT1(newValue);
+                    break;
+                case "t2":
+                    if ("P".equals(appointment.getT2())) appointment.setT2(newValue);
+                    break;
+                case "t3":
+                    if ("P".equals(appointment.getT3())) appointment.setT3(newValue);
+                    break;
+                case "t4":
+                    if ("P".equals(appointment.getT4())) appointment.setT4(newValue);
+                    break;
+                case "t5":
+                    if ("P".equals(appointment.getT5())) appointment.setT5(newValue);
+                    break;
+                case "t6":
+                    if ("P".equals(appointment.getT6())) appointment.setT6(newValue);
+                    break;
+                case "t7":
+                    if ("P".equals(appointment.getT7())) appointment.setT7(newValue);
+                    break;
+                case "t8":
+                    if ("P".equals(appointment.getT8())) appointment.setT8(newValue);
+                    break;
+                case "t9":
+                    if ("P".equals(appointment.getT9())) appointment.setT9(newValue);
+                    break;
+                case "t10":
+                    if ("P".equals(appointment.getT10())) appointment.setT10(newValue);
+                    break;
+                case "t11":
+                    if ("P".equals(appointment.getT11())) appointment.setT11(newValue);
+                    break;
+                case "t12":
+                    if ("P".equals(appointment.getT12())) appointment.setT12(newValue);
+                    break;
+                default:
+                    return false;
+            }
+
+            appointmentRepository.save(appointment);
+
+            // Update the status in AppointmentSummary
+            List<AppointmentSummary> summaries = appointmentSummaryRepository.findByAppointmentId(appointmentId);
+            for (AppointmentSummary summary : summaries) {
+                String summaryTime=summary.getTime();
+
+                if (summaryTime !=null && summaryTime.equals(time)) {
+                    summary.setStatus(newStatus);
+                    appointmentSummaryRepository.save(summary);
+                }
+            }
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+   
 }

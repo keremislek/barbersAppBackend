@@ -33,19 +33,19 @@ public class AppointmentsRequest {
 
 
     public String getTimeFieldWithB() {
-        if ("P".equals(t1)) return "t1";
-        if ("P".equals(t2)) return "t2";
-        if ("P".equals(t3)) return "t3";
-        if ("P".equals(t4)) return "t4";
-        if ("P".equals(t5)) return "t5";
-        if ("P".equals(t6)) return "t6";
-        if ("P".equals(t7)) return "t7";
-        if ("P".equals(t8)) return "t8";
-        if ("P".equals(t9)) return "t9";
-        if ("P".equals(t10)) return "t10";
-        if ("P".equals(t11)) return "t11";
-        if ("P".equals(t12)) return "t12";
-        return null; // P değeri bulunmazsa null döner
+        if ("B".equals(t1)) return "t1";
+        if ("B".equals(t2)) return "t2";
+        if ("B".equals(t3)) return "t3";
+        if ("B".equals(t4)) return "t4";
+        if ("B".equals(t5)) return "t5";
+        if ("B".equals(t6)) return "t6";
+        if ("B".equals(t7)) return "t7";
+        if ("B".equals(t8)) return "t8";
+        if ("B".equals(t9)) return "t9";
+        if ("B".equals(t10)) return "t10";
+        if ("B".equals(t11)) return "t11";
+        if ("B".equals(t12)) return "t12";
+        return null; // B değeri bulunmazsa null döner
     }
 
 }
