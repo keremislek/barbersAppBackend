@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.barbersApp.entities.ServicesInfo;
 import com.example.barbersApp.request.ServicesInfoCreateRequest;
+import com.example.barbersApp.request.ServicesInfoUpdateRequest;
 import com.example.barbersApp.response.ServicesInfoBarberIdResponse;
 import com.example.barbersApp.response.ServicesInfoResponse;
 
@@ -13,5 +14,6 @@ public interface ServicesInfoService {
     ServicesInfoResponse getServicesInfoById(Long id);
     List<ServicesInfoBarberIdResponse> getServicesByBarberId(Long id);
     void deleteServicesInfoById(Long id);
+    void updateServicesInfo(ServicesInfoUpdateRequest request);
 
 }

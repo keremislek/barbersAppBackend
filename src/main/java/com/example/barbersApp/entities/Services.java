@@ -1,6 +1,7 @@
 package com.example.barbersApp.entities;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -22,23 +23,27 @@ import lombok.experimental.SuperBuilder;
 @Data
 @Entity
 @SuperBuilder
-@Table(name="services")
+@Table(name = "services")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Services {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String serviceName;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     @JoinTable(name = "barber_services",
-               joinColumns = @JoinColumn(name = "service_id",referencedColumnName = "id"),
+               joinColumns = @JoinColumn(name = "service_id", referencedColumnName = "id"),
                inverseJoinColumns = @JoinColumn(name = "barber_id", referencedColumnName = "id"))
     private List<Barber> barber;
 
-    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL)
-	private List<ServicesInfo> servicesInfo;
+    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ServicesInfo> servicesInfo = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "services", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AppointmentSummary> appointmentSummaries = new ArrayList<>();
 }
+

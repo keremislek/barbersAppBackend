@@ -123,6 +123,10 @@ public class BarberServiceImpl implements BarberService {
 		avg=avg/ratings.size();
 		
 		String fullAddress = barber.getAddressesInfo() != null ? barber.getAddressesInfo().getFullAddress() : "Bilinmeyen Adres";
+		String districtName = barber.getAddressesInfo()!= null ? barber.getAddressesInfo().getDistrict().getName() : "Bilinmeyen İlçe";
+		
+		fullAddress+=" / "+districtName;
+
 		
 
 		BarberDetailResponse barberDetailResponse=BarberDetailResponse.builder()
@@ -260,6 +264,21 @@ public void updateBarberEmailAndPassword(Long id, String email, String password)
 	barber.setEmail(email);
 	barber.setPassword(passwordEncoder.encode(password));
 	barberRepository.save(barber);
+}
+
+@Override
+public void updateBarberPhoto(Long id, String photoUrl) {
+	Barber barber= barberRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Barber not found by id : "+id));
+	barber.setPhotoUrl(photoUrl);
+	barberRepository.save(barber);
+}
+
+@Override
+public void updateBarberName(Long id, String name) {
+	Barber barber= barberRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Barber not found by id : "+id));
+	barber.setBarberName(name);
+	barberRepository.save(barber);
+	
 }
 
 

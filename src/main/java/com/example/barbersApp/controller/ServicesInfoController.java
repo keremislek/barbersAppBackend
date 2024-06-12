@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.barbersApp.entities.ServicesInfo;
 import com.example.barbersApp.request.ServicesInfoCreateRequest;
+import com.example.barbersApp.request.ServicesInfoUpdateRequest;
 import com.example.barbersApp.response.ServicesInfoBarberIdResponse;
 import com.example.barbersApp.response.ServicesInfoResponse;
 import com.example.barbersApp.service.ServicesInfoService;
@@ -57,6 +58,11 @@ public class ServicesInfoController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Services Info deleted with id : "+id);
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<String> updateServicesInfo(@RequestBody ServicesInfoUpdateRequest request){
+    servicesInfoService.updateServicesInfo(request);
+    return ResponseEntity.status(HttpStatus.OK).body("ServicesInfo updated "+request.getId()); 
+    }
     
     
 }

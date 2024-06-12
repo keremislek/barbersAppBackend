@@ -3,6 +3,7 @@ package com.example.barbersApp.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.hibernate.annotations.Cascade;
 import org.springframework.stereotype.Service;
 
 import com.example.barbersApp.entities.Barber;
@@ -12,11 +13,13 @@ import com.example.barbersApp.repository.BarberRepository;
 import com.example.barbersApp.repository.ServiceRepository;
 import com.example.barbersApp.repository.ServicesInfoRepository;
 import com.example.barbersApp.request.ServicesInfoCreateRequest;
+import com.example.barbersApp.request.ServicesInfoUpdateRequest;
 import com.example.barbersApp.response.ServicesInfoBarberIdResponse;
 import com.example.barbersApp.response.ServicesInfoResponse;
 import com.example.barbersApp.service.ServicesInfoService;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
  
 @Service
@@ -78,9 +81,19 @@ public class ServicesInfoImpl implements ServicesInfoService{
     }
 
     @Override
+    @Transactional
     public void deleteServicesInfoById(Long id) {
         ServicesInfo serviceInfo=servicesInfoRepository.findById(id).orElseThrow(()->new EntityNotFoundException("ServicesInfo not found with id : "+id));
         servicesInfoRepository.delete(serviceInfo);
+    }
+
+    @Override
+    public void updateServicesInfo(ServicesInfoUpdateRequest request) {
+        ServicesInfo servicesInfo=servicesInfoRepository.findById(request.getId()).orElseThrow(() -> new EntityNotFoundException("ServicesInfo not found with id: " + request.getId()));
+        servicesInfo.setPrice(request.getPrice());
+        servicesInfo.setTime(request.getTime());
+       
+        servicesInfoRepository.save(servicesInfo);
     }
 
     

@@ -53,6 +53,12 @@ public class BarberController {
 		var barberResponse=barberService.getBarberById(id);
 		return ResponseEntity.ok().body(barberResponse);
 	}
+
+	@PutMapping("/{id}/photo")
+	public ResponseEntity<Void> updateBarberPhoto(@PathVariable Long id, @RequestBody String photoUrl){
+		barberService.updateBarberPhoto(id,photoUrl);
+		return ResponseEntity.noContent().build();
+	}
 	
 
 	@PostMapping("/register")
@@ -86,9 +92,17 @@ public class BarberController {
 		barberService.updateBarberEmailAndPassword(id,request.getEmail(),request.getPassword());
 		return ResponseEntity.noContent().build();
 	}
+
+	@PutMapping("/{id}/name")
+		public ResponseEntity<Void> updateBarberName(@PathVariable Long id, @RequestBody String name){
+			barberService.updateBarberName(id,name);
+			return ResponseEntity.noContent().build();
+
+		}
+	}
 	
 
 	
 	
 	
-}
+

@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
-import java.util.HashMap;
+
 import java.util.stream.Collectors;
 
-import org.springframework.cglib.core.Local;
+
 import org.springframework.stereotype.Service;
 
 import com.example.barbersApp.entities.AdressesInfo;
@@ -31,7 +31,7 @@ import com.example.barbersApp.repository.RatingRepository;
 import com.example.barbersApp.repository.ServiceRepository;
 import com.example.barbersApp.repository.ServicesInfoRepository;
 import com.example.barbersApp.request.AppointmentsRequest;
-import com.example.barbersApp.request.SummaryRequest;
+
 import com.example.barbersApp.response.AppointmentsResponse;
 import com.example.barbersApp.response.AvaliableAppointmentHours;
 import com.example.barbersApp.response.BarberDetailResponse;
@@ -88,7 +88,9 @@ public class AppointmentsServiceImpl implements AppointmentsService {
         for (Long serviceId : request.getServiceIds()){
             AppointmentSummary appointmentSummary = new AppointmentSummary();
             appointmentSummary.setAppointmentId(savedApointments.getId());
-            appointmentSummary.setServiceId(serviceId);
+            Services services= new Services();
+            services.setId(serviceId);
+            appointmentSummary.setServices(services);
             appointmentSummary.setUserId(request.getUserId());
             appointmentSummary.setDate(request.getDate());
             appointmentSummary.setStatus(AppointmentStatus.PENDING);
@@ -124,7 +126,7 @@ public class AppointmentsServiceImpl implements AppointmentsService {
     }
     
     private void updateTFieldIfNeeded(String currentValue, String newValue, SetterFunction setter) {
-        if ("B".equals(currentValue) || "B".equals(newValue)) {
+        if ("F".equals(currentValue) && "B".equals(newValue)) {
             setter.set("P");
         } else if (!"T".equals(currentValue)) {
             setter.set(newValue);
@@ -142,19 +144,23 @@ public class AppointmentsServiceImpl implements AppointmentsService {
         Appointments appointments = new Appointments();
         appointments.setBarberId(request.getBarberId());
         appointments.setDate(request.getDate());
-        appointments.setT1(request.getT1());
-        appointments.setT2(request.getT2());
-        appointments.setT3(request.getT3());
-        appointments.setT4(request.getT4());
-        appointments.setT5(request.getT5());
-        appointments.setT6(request.getT6());
-        appointments.setT7(request.getT7());
-        appointments.setT8(request.getT8());
-        appointments.setT9(request.getT9());
-        appointments.setT10(request.getT10());
-        appointments.setT11(request.getT11());
-        appointments.setT12(request.getT12());
+        appointments.setT1(convertStatus(request.getT1()));
+        appointments.setT2(convertStatus(request.getT2()));
+        appointments.setT3(convertStatus(request.getT3()));
+        appointments.setT4(convertStatus(request.getT4()));
+        appointments.setT5(convertStatus(request.getT5()));
+        appointments.setT6(convertStatus(request.getT6()));
+        appointments.setT7(convertStatus(request.getT7()));
+        appointments.setT8(convertStatus(request.getT8()));
+        appointments.setT9(convertStatus(request.getT9()));
+        appointments.setT10(convertStatus(request.getT10()));
+        appointments.setT11(convertStatus(request.getT11()));
+        appointments.setT12(convertStatus(request.getT12()));
         return appointments;
+    }
+    
+    private static String convertStatus(String status) {
+        return "B".equals(status) ? "P" : status;
     }
 
     @Override
@@ -379,7 +385,7 @@ public class AppointmentsServiceImpl implements AppointmentsService {
 
                 String services= "";
                 for (AppointmentSummary summary : entry.getValue()) {
-                    ServicesInfo servicesInfo=servicesInfoRepository.findById(summary.getServiceId()).orElse(null);
+                    ServicesInfo servicesInfo=servicesInfoRepository.findById(summary.getServices().getId()).orElse(null);
                     services +=(""+servicesInfo.getServices().getServiceName()+", ");
                 }
                 customerResponse.setServices(services);
@@ -425,7 +431,7 @@ public class AppointmentsServiceImpl implements AppointmentsService {
 
                String services="";
                for (AppointmentSummary summary : entry.getValue()) {
-                    ServicesInfo servicesInfo=servicesInfoRepository.findById(summary.getServiceId()).orElse(null);
+                    ServicesInfo servicesInfo=servicesInfoRepository.findById(summary.getServices().getId()).orElse(null);
                     
                     services += (""+servicesInfo.getServices().getServiceName()+" - "); 
                }

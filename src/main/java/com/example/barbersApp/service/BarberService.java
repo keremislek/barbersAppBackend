@@ -40,5 +40,9 @@ public interface BarberService {
 
     void updateBarberEmailAndPassword(Long id, String email, String password);
 
+    void updateBarberPhoto(Long id, String photoUrl);
+
+    void updateBarberName(Long id, String name);
+
 
 }
