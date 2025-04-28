@@ -23,9 +23,7 @@ public class Appointments {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
     private Long barberId;
-    private Long serviceId;
     private LocalDate date;
     private String t1;
     private String t2;

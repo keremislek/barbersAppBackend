@@ -8,33 +8,36 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-@Data
 @Entity
-@Table(name="comments")
+@Table(name = "address_info")
 @SuperBuilder
-@NoArgsConstructor
 @AllArgsConstructor
-public class Comment {
-    @Id
+@NoArgsConstructor
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class AdressesInfo {
+    
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "barber_id",referencedColumnName = "id")
+    private String fullAddress;
+
+    @OneToOne
+    @JoinColumn(name = "barber_id", referencedColumnName = "id")
     private Barber barber;
+    
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "district_id", referencedColumnName = "id")
+    private District district;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE,CascadeType.PERSIST})
-    @JoinColumn(name = "customer_id",referencedColumnName = "id")
-    private Customer customer;
-
-
-    private String text;
-
-
+    
 }

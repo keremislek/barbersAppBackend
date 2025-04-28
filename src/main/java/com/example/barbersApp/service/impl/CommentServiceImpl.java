@@ -1,9 +1,12 @@
 package com.example.barbersApp.service.impl;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.example.barbersApp.entities.Barber;
@@ -36,19 +39,9 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
-    public List<CommentResponse> getAllCommentWithsParam(Optional<Long> customerId, Optional<Long> barberId) {
-        List<Comment> comments;
-        if(customerId.isPresent() && barberId.isPresent()){
-            comments= commentRepository.findByCustomerIdAndBarberId(customerId,barberId);
-        }
-        else if(customerId.isPresent()){
-            comments=commentRepository.findByCustomerId(customerId);
-        }
-        else if(barberId.isPresent()){
-            comments=commentRepository.findByBarberId(barberId);
-        }else{
-            comments=commentRepository.findAll();
-        }
+    public List<CommentResponse> getAllComment() {
+        List<Comment> comments=commentRepository.findAll();
+        
 
         return comments.stream().map(comment->CommentResponse.builder()
         .commentId(comment.getId())
@@ -138,10 +131,36 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     @Transactional
-    public List<CommentResponse> getAllCommentByBarber(Optional<Long> barberId) {
+    public List<CommentResponse> getAllCommentByBarber(Long barberId) {
         
 
-        throw new UnsupportedOperationException("Unimplemented method 'getAllCommentByBarber'");
+   
+        Barber barber = barberRepository.findById(barberId).orElse(null);
+
+  
+    if (barber == null) {
+        return Collections.emptyList();
+    }
+
+    // Yorumları bul
+    List<Comment> comments = commentRepository.findByBarberId(barberId);
+
+    // CommentResponse nesnelerine dönüştür
+    List<CommentResponse> commentResponses = comments.stream()
+            .map(comment -> {
+                CommentResponse response = new CommentResponse();
+                response.setCommentId(comment.getId());
+                response.setCustomerId(comment.getCustomer().getId());
+                response.setCustomerName(comment.getCustomer().getFirstName());
+                response.setBarberId(barber.getId());
+                response.setBarberName(barber.getBarberName());
+                response.setText(comment.getText());
+                return response;
+            })
+            .collect(Collectors.toList());
+
+    return commentResponses;
+        
     }
 
     

@@ -1,5 +1,7 @@
 package com.example.barbersApp.response;
 
+import org.apache.el.stream.Stream;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,4 +24,4 @@ public class AvaliableAppointmentHours {
     private String t10;
     private String t11;
     private String t12;
-}
+    }

@@ -1,5 +1,9 @@
 package com.example.barbersApp.service.impl;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 import com.example.barbersApp.entities.Barber;
@@ -11,6 +15,7 @@ import com.example.barbersApp.repository.RatingRepository;
 import com.example.barbersApp.request.RatingCreateRequest;
 import com.example.barbersApp.request.RatingUpdateRequest;
 import com.example.barbersApp.response.RatingCreateResponse;
+import com.example.barbersApp.response.RatingResponse;
 import com.example.barbersApp.service.RatingService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -68,4 +73,31 @@ public class RatingServiceImpl implements RatingService{
         return ratingCreateResponse;
     }
 
+    @Override
+    public List<RatingResponse> getAllRatingWithParam(Optional<Long> customerId, Optional<Long> barberId) {
+       List<Rating> ratings;
+       if(customerId.isPresent()&&barberId.isPresent()){
+        ratings=ratingRepository.findByCustomerIdAndBarberId(customerId,barberId);
+       } 
+       else if(customerId.isPresent()){
+        ratings=ratingRepository.findByCustomerId(customerId);
+       }
+       else if(barberId.isPresent()){
+        ratings=ratingRepository.findByBarberId(barberId);
+       }
+       else{
+        ratings=ratingRepository.findAll();
+       }
+       return ratings.stream().map(rating->RatingResponse.builder()
+       .ratingId(rating.getId())
+       .barberId(rating.getBarber().getId())
+       .barberName(rating.getBarber().getBarberName())
+       .customerId(rating.getCustomer().getId())
+       .customerName(rating.getCustomer().getFirstName())
+       .rate(rating.getRate())
+       .build()).collect(Collectors.toList());
+       
+    }
+
+   
 }

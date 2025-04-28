@@ -11,7 +11,7 @@ import com.example.barbersApp.response.CommentResponse;
 public interface CommentService {
 
 
-    List<CommentResponse> getAllCommentWithsParam(Optional<Long> customerId,Optional<Long> barberId);
+   
 
     CommentResponse getOneCommentById(Long commentId);
 
@@ -21,6 +21,8 @@ public interface CommentService {
 
     void deleteComment(Long commentId);
 
-    List<CommentResponse> getAllCommentByBarber(Optional<Long> barberId);
+    List<CommentResponse> getAllCommentByBarber(Long optionalbarberId);
+
+    List<CommentResponse> getAllComment();
 
 }

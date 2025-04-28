@@ -41,6 +41,7 @@ public class AuthenticationService {
             var jwtToken = jwtService.generateToken(customer);
             return AuthenticationResponse.builder()
                     .token(jwtToken)
+                    .id(customer.getId())
                     .build();
         } else {
             Barber barber = barberRepository.findByEmail(request.getEmail()).orElse(null);
@@ -48,6 +49,7 @@ public class AuthenticationService {
                 var jwtToken = jwtService.generateToken(barber);
                 return AuthenticationResponse.builder()
                         .token(jwtToken)
+                        .id(barber.getId())
                         .build();
             }
         }

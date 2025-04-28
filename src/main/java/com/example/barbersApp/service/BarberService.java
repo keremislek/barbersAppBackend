@@ -11,12 +11,16 @@ import com.example.barbersApp.request.CreateBarberRequest;
 import com.example.barbersApp.response.AuthenticationResponse;
 import com.example.barbersApp.response.BarberDetailResponse;
 import com.example.barbersApp.response.BarberResponse;
+import com.example.barbersApp.response.BarberTop5Query;
+import com.example.barbersApp.response.FamousBarbers;
 
 
 public interface BarberService {
 
 
-    AuthenticationResponse register(CreateBarberRequest request);
+    Object getSearchByName = null;
+
+	AuthenticationResponse register(CreateBarberRequest request);
 
     AuthenticationResponse authenticate(AuthenticationRequest request);
 
@@ -27,6 +31,10 @@ public interface BarberService {
     BarberDetailResponse getBarberById(Long id);
 
     BarberResponse getBarberByEmail(String email);
+
+    List<FamousBarbers> getFamousBarberByRating();
+
+    List<BarberDetailResponse> getBySearchName(String name);
 
 
 }
